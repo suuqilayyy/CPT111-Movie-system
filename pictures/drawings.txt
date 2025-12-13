@@ -1,0 +1,220 @@
+系统高层架构图
+graph TB
+
+
+    subgraph "UI Layer"
+
+        UI1[LoginUI ]
+        UI2[MainDashboardUI]
+        UI3[MovieBrowserUI]
+        UI4[RecommendationUI]
+        UI5[WatchlistUI]
+        UI6[HistoryUI]
+        UI7[ProfileUI]
+        UI8[srttingUI]
+ 
+    end
+
+    subgraph "Backend Layer"
+        
+
+        subgraph "Business Logic Layer"
+            B1[UserManager]
+            B2[AuthenticationService]
+            B3[MovieManager]
+            B4[RecommendationEngine]
+            B5[WatchlistManager]
+            B6[HistoryManager]   
+        end
+
+        subgraph "Data Access Layer"
+            D1[UserDAO]
+            D2[MovieDAO]
+            D3[WatchlistDAO]
+            D4[HistoryDAO]
+        end  
+    end
+    
+
+    
+    subgraph "Data Layer"
+        DS1[users.csv]
+        DS2[movies.csv]
+        DS3[watchlist.csv]
+        DS4[history.csv]
+    end
+
+    subgraph "Boot & Routing"
+        C1[AppLauncher]
+        C2[Main]
+	C3[Router]
+    end
+
+B1--> D1
+B2--> D1
+B3--> D2
+B4--> D2
+B5--> D3
+B6--> D4
+
+2.Detailed Class Relationship Diagram
+
+classDiagram
+    class Movie {
+        <<abstract>>
+        +id
+        +title
+        +genre
+        +year
+        +rating
+    }
+    
+    class FeatureFilm {
+        +category
+    }
+    
+    class ShortFilm {
+        +category
+    }
+    
+    class User {
+        +username
+        +role
+        +watchlist
+        +history
+        +getRecommendationLimit()
+    }
+    
+    class Watchlist {
+        +movieIds
+        +addMovie()
+        +contains()
+    }
+    
+    class History {
+        +entries
+        +getGenreCounts()
+    }
+    
+    class RecommendationEngine {
+        +movies
+        +getRecommendations()
+    }
+    
+    class FileManager {
+        +loadMovies()
+        +loadUsers()
+        +saveUsers()
+    }
+    
+    class MovieFactory {
+        +createMovie()
+    }
+    
+    class UserFactory {
+        +createUser()
+    }
+    
+    class PasswordUtil {
+        +hashPassword()
+        +validatePassword()
+    }
+    
+    class Main {
+        +main()
+        +displayMenu()
+    }
+    
+    class MovieAppGUI {
+        +start()
+        +showLoginScene()
+    }
+
+    Movie <|-- FeatureFilm
+    Movie <|-- ShortFilm
+
+    User <-- Watchlist
+    User <-- History
+
+    RecommendationEngine --> Movie : uses
+    RecommendationEngine --> User : uses
+    RecommendationEngine --> History : queries
+    
+    FileManager --> MovieFactory : creates
+    FileManager --> UserFactory : creates
+    UserFactory --> PasswordUtil : calls
+    
+    Main --> FileManager : loads data
+    Main --> RecommendationEngine : gets recommendations
+    
+    MovieAppGUI --> FileManager : loads data
+    MovieAppGUI --> RecommendationEngine : gets recommendations
+
+
+3. Runtime Interaction & Data Flow Diagram
+
+flowchart TD
+    subgraph "Movie Recommendation System Runtime Data Flow"
+        U[User] -->|"1. Operation Request"| UI[User Interface]
+        UI -->|"2. Data Load/Save"| FM[FileManager]
+        FM -->|"3. Object Creation"| FAC[MovieFactory/UserFactory]
+        FAC -->|"4. Data Storage"| DB[(In-Memory HashMap)]
+        
+        UI -->|"5. Login Authentication"| PU[PasswordUtil]
+        PU -->|"6. Query User"| DB
+        PU -->|"7. Authentication Result"| UI
+        
+        UI -->|"8. Recommendation Request"| RE[RecommendationEngine]
+        RE -->|"9. Query History"| HIS[User History Object]
+        RE -->|"10. Query Movie Database"| DB
+        RE -->|"11. Recommendation Result"| UI
+    end
+
+4.Recommendation Algorithms: Strategies & Flow
+
+flowchart LR
+
+    Start[Start Recommendation] --> Auth{User Role}
+    
+    Auth -->|PREMIUM| HP[Hybrid Recommendation]
+    Auth -->|BASIC| SS{Select Basic Strategy}
+    
+    SS -->|Genre Preference| GP[Genre Recommendation]
+    SS -->|New User| RP[Rating Recommendation]
+    SS -->|Has History| YP[Year Recommendation]
+    
+    GP --> Funnel
+    RP --> Funnel
+    YP --> Funnel
+    HP --> Funnel
+    
+    subgraph Funnel [Four-Layer Smart Recommendation Funnel]
+        direction LR
+        L1[Layer 1<br/>Priority Recommendation] --> C1{Enough Quantity?}
+        C1 -->|No| L2[Layer 2<br/>Supplemental Recommendation]
+        C1 -->|Yes| Skip
+        
+        L2 --> C2{Enough Quantity?}
+        C2 -->|No| L3[Layer 3<br/>Relaxed Conditions]
+        C2 -->|Yes| Skip
+        
+        L3 --> C3{Enough Quantity?}
+        C3 -->|No| L4[Layer 4<br/>Fallback Recommendation]
+        C3 -->|Yes| Skip
+        
+        L4 --> End
+    end
+    
+    Skip[Skip Rest] --> End
+    End --> Result[Return Results]
+    
+    subgraph L1_Detail [Layer 1 Strategy Details]
+        direction LR
+        G1[Genre: Favorite Type]
+        R1[Rating: High Score]
+        Y1[Year: Preferred Era]
+        H1[Hybrid: Comprehensive Top]
+    end
+    
+    L1 --> L1_Detail
+     linkStyle default stroke-width:2px
