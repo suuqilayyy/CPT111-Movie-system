@@ -11,7 +11,7 @@ The final score of this assignment is 81, ranking 2nd in the ICS major.
 To run this project, you need:
 1.  **IntelliJ IDEA** (Recommended).
 2.  **Java 17** or higher.
-3.  The **JavaFX SDK** is already included in the folder `javafx-sdk-21.0.9`, so you don't need to download it separately.
+3.  The **JavaFX SDK** is  `javafx-sdk-21.0.9`.
 
 ## How to Run (Important!)
 
