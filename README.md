@@ -1,21 +1,60 @@
-java 小组作业
+# CPT111 Group 25 Project - Movie Recommendation and Tracker
 
-报告要求如下（待更新）
+## About the Project
+This is the Coursework 3 submission for our group. We built a Movie Recommendation and Tracker App using Java and JavaFX. 
 
-报告格式 所有答案必须用英语书写。 报告必须：
+The main idea is to help users manage their movie watchlists. We also implemented a recommendation algorithm that suggests movies based on genres and user ratings.
 
-以PDF格式提交，最多15页（请勿提交.doc、.docx或Apple Pages）
+The final score of this assignment is 81, ranking 2nd in the ICS major.
 
-包含标题和副标题
+## Requirements
+To run this project, you need:
+1.  **IntelliJ IDEA** (Recommended).
+2.  **Java 17** or higher.
+3.  The **JavaFX SDK** is already included in the folder `javafx-sdk-21.0.9`, so you don't need to download it separately.
 
-页边距为3厘米
+## How to Run (Important!)
 
-使用清晰易读的字体（例如，Calibri、Arial或Times New Roman）
+**Method 1: Run in IntelliJ (Easiest way)**
+We strongly recommend running this inside IntelliJ IDEA to avoid path issues.
 
-字体大小为11号，1.5倍行距
+1.  Open the folder `CW3-Ver6` as a project in IntelliJ.
+2.  Go to **File -> Project Structure -> Libraries**.
+3.  Add the `lib` folder inside `javafx-sdk-21.0.9`.
+4.  Find `AppLauncher.java` in `src/main/java/movietracker/`.
+5.  Right-click and Run.
 
-标有页码
+**Method 2: Command Line**
+If you want to run it from the terminal, please make sure you are in the root directory.
 
-人工智能（AI）使用权限 对于本次作业，你被允许非实质性使用AI。这意味着AI只能用于次要任务，例如语法纠正、格式调整或一般性建议（例如，“提高清晰度”）。你应该保留一份未经AI处理的作品版本记录，在验证过程中你可能需要提供该记录。如果你不确定某项AI的具体使用是否被允许，请咨询模块负责人。在你的报告参考文献中，你应该简要注明所用工具的名称和版本，以及它的用途，例如：
+* **Compile:**
+    ```
+    javac --module-path "javafx-sdk-21.0.9\lib" --add-modules javafx.controls,javafx.fxml -sourcepath src\main\java -d out src\main\java\movietracker\*.java
+    ```
+    *(Note: The `-sourcepath` flag ensures it finds files in subfolders like `ui` and `backend` automatically)*
 
-[1] DeepSeek V3.1，网址：https://www.deepseek.com。用于语法校对。
+* **Run:**
+    ```
+    java --module-path "javafx-sdk-21.0.9\lib" --add-modules javafx.controls,javafx.fxml -cp out movietracker.AppLauncher
+    ```
+
+**Note on Resources:**
+You need to copy the resource files (images, fxml) to the `out` folder.
+```
+xcopy /E /I /Y src\main\resources out
+```
+(If you don't do this, images or pages won't load!)
+
+## Features We Implemented
+* **User Account Levels (OOP)**: 
+    *   **Basic User**: Standard access with a recommendation limit of 6 movies.
+    *   **Premium User**: Enhanced privileges with a limit of 16 movies and **Password Hashing**.
+* **Security**: Implemented a custom hashing algorithm (Salt + Shift) for Premium User passwords to ensure data safety.
+* **Smart Recommendations**: The engine analyzes user History to calculate genre scores and recommends Top-N movies accordingly.
+* **MVC & FXML**: The application uses a strict Model-View-Controller architecture with FXML for UI separation.
+* **Data Persistence**: Custom CSV parser handles data storage for Users, Watchlists, and History.
+
+## Known Issues / Future Improvements
+* **Image Caching**: Poster images may load slowly on the first launch.
+* **High-DPI Scaling**: On 4K monitors, the window size might need manual adjustment.
+* **Data Integrity**: Please avoid manually modifying `users.csv`, especially for Premium Users, as this may break the password hash verification.
